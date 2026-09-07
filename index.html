@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="lt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="GruZExpert – profesionalus krovinių pervežimas ir perkraustymo paslaugos Vilniuje bei visoje Lietuvoje." />
+    <title>GruZExpert | Krovinių pervežimas Vilniuje</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#order" data-i18n="skip">Pereiti prie užsakymo</a>
+    <header class="site-header" id="top">
+      <div class="container nav-wrap">
+        <a href="#top" class="brand" aria-label="GruZExpert – į pradžią">
+          <span class="brand-mark" aria-hidden="true"><i></i><b></b></span>
+          <span class="brand-name"><small>MB</small>GruZ<span>Expert</span></span>
+        </a>
+        <button class="menu-toggle" aria-label="Atidaryti meniu" aria-expanded="false"><span></span><span></span><span></span></button>
+        <nav class="main-nav" aria-label="Pagrindinis meniu">
+          <a href="#services" data-i18n="navServices">Paslaugos</a>
+          <a href="#advantages" data-i18n="navWhy">Privalumai</a>
+          <a href="#fleet" data-i18n="navFleet">Autoparkas</a>
+          <a href="#prices" data-i18n="navPrices">Kainos</a>
+          <a href="#contacts" data-i18n="navContacts">Kontaktai</a>
+        </nav>
+        <div class="nav-tools">
+          <a class="phone-link" data-company-phone href="tel:+37066242235" aria-label="Skambinti +370 662 42 235"><span aria-hidden="true">☎</span> +370 662 42 235</a>
+          <div class="language-picker" aria-label="Kalbos pasirinkimas">
+            <button class="language active" data-lang="lt" aria-pressed="true">LT</button>
+            <button class="language" data-lang="ru" aria-pressed="false">RU</button>
+            <button class="language" data-lang="en" aria-pressed="false">EN</button>
+          </div>
+          <a href="#order" class="button button-small" data-i18n="quote">Skaičiuoti kainą</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-photo" role="img" aria-label="Kraustymo automobilis ir dėžės"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-angle top-angle"></div>
+        <div class="container hero-content">
+          <p class="eyebrow" data-i18n="heroEyebrow">Vilnius • Lietuva • Europa</p>
+          <h1 data-i18n="heroTitle">Krovinių pervežimas ir perkraustymas <em>Vilniuje</em></h1>
+          <p class="hero-copy" data-i18n="heroCopy">Greitai, patikimai ir saugiai. Dirbame visą parą, kiekvieną dieną.</p>
+          <div class="hero-points">
+            <span data-i18n="heroPoint1">Patyrę krovėjai</span><span data-i18n="heroPoint2">Saugus pervežimas</span><span data-i18n="heroPoint3">Sąžininga kaina</span>
+          </div>
+          <a href="#order" class="button hero-button" data-i18n="orderNow">Užsakyti pervežimą</a>
+        </div>
+        <div class="hero-corner" aria-hidden="true"></div>
+      </section>
+
+      <section class="quick-order" id="order" aria-labelledby="order-title">
+        <div class="container order-layout">
+          <div class="order-intro">
+            <p class="section-kicker" data-i18n="orderKicker">Greitas užsakymas</p>
+            <h2 id="order-title" data-i18n="orderTitle">Apskaičiuokime Jūsų pervežimą</h2>
+            <p data-i18n="orderText">Užpildykite formą – susisieksime netrukus ir patikslinsime kainą.</p>
+            <p class="minimum" data-i18n="minimum">Minimalus užsakymas — 2 valandos.</p>
+          </div>
+          <form id="order-form" class="order-form" novalidate>
+            <div class="form-grid addresses">
+              <label><span data-i18n="from">Iš kur</span><input name="from" type="text" required data-i18n-placeholder="fromPlaceholder" placeholder="Tikslus paėmimo adresas" autocomplete="street-address" /></label>
+              <label><span data-i18n="to">Į kur</span><input name="to" type="text" required data-i18n-placeholder="toPlaceholder" placeholder="Tikslus pristatymo adresas" /></label>
+            </div>
+            <div class="form-grid">
+              <label><span data-i18n="name">Vardas ir pavardė</span><input name="name" type="text" required autocomplete="name" /></label>
+              <label><span data-i18n="phone">Telefonas</span><input name="phone" type="tel" required placeholder="+370 ..." autocomplete="tel" /></label>
+            </div>
+            <div class="form-grid">
+              <label><span data-i18n="email">El. paštas</span><input name="email" type="email" required autocomplete="email" /></label>
+              <label><span data-i18n="date">Pageidaujama data</span><input name="date" type="date" /></label>
+            </div>
+            <div class="form-grid">
+              <label><span data-i18n="pickupLift">Ar yra liftas paėmimo vietoje?</span><select name="pickupLift" required><option value="" data-i18n="select">Pasirinkite</option><option value="yes" data-i18n="yes">Taip</option><option value="no" data-i18n="no">Ne</option></select></label>
+              <label><span data-i18n="deliveryLift">Ar yra liftas pristatymo vietoje?</span><select name="deliveryLift" required><option value="" data-i18n="select">Pasirinkite</option><option value="yes" data-i18n="yes">Taip</option><option value="no" data-i18n="no">Ne</option></select></label>
+            </div>
+            <fieldset class="tariff-fieldset">
+              <legend data-i18n="tariff">Pasirinkite tarifą</legend>
+              <div class="tariffs">
+                <label class="tariff"><input type="radio" name="tariff" value="vehicle" required /><span><strong data-i18n="tariffVehicle">Automobilis</strong><b>30 €/h</b></span></label>
+                <label class="tariff"><input type="radio" name="tariff" value="oneMover" /><span><strong data-i18n="tariffOne">Automobilis + 1 krovėjas</strong><b>45 €/h</b></span></label>
+                <label class="tariff"><input type="radio" name="tariff" value="twoMovers" /><span><strong data-i18n="tariffTwo">Automobilis + 2 krovėjai</strong><b>60 €/h</b></span></label>
+              </div>
+            </fieldset>
+            <label class="full"><span data-i18n="details">Papildoma informacija</span><textarea name="details" rows="2" data-i18n-placeholder="detailsPlaceholder" placeholder="Aukštas, krovinio tipas, pageidavimai..."></textarea></label>
+            <label class="consent"><input type="checkbox" name="consent" required /><span data-i18n="consent">Sutinku, kad mano duomenys būtų naudojami užklausai apdoroti.</span></label>
+            <button class="button form-button" type="submit" data-i18n="sendOrder">Siųsti užklausą</button>
+            <p class="form-status" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+
+      <section class="section services" id="services" aria-labelledby="services-title">
+        <div class="container">
+          <p class="section-kicker" data-i18n="servicesKicker">Kuo galime padėti</p>
+          <h2 id="services-title" data-i18n="servicesTitle">Mūsų <em>paslaugos</em></h2>
+          <p class="section-lead" data-i18n="servicesLead">Paspauskite pasirinktą paslaugą ir sužinokite daugiau.</p>
+          <div class="service-grid" id="service-grid"></div>
+        </div>
+      </section>
+
+      <section class="section dark advantages" id="advantages" aria-labelledby="advantages-title">
+        <div class="yellow-panel"></div>
+        <div class="container advantages-layout">
+          <div>
+            <p class="section-kicker light" data-i18n="whyKicker">GruZExpert pasirinkimas</p>
+            <h2 id="advantages-title" data-i18n="whyTitle">Kodėl verta rinktis <em>mus?</em></h2>
+            <div class="advantage-list">
+              <div><b>✓</b><span data-i18n="adv1">Konkurencingos kainos</span></div>
+              <div><b>✓</b><span data-i18n="adv2">Patyrę ir mandagūs darbuotojai</span></div>
+              <div><b>✓</b><span data-i18n="adv3">Tvarkingas transportas</span></div>
+              <div><b>✓</b><span data-i18n="adv4">Atsakingas požiūris į turtą</span></div>
+              <div><b>✓</b><span data-i18n="adv5">Lankstus laikas, dirbame 24/7</span></div>
+              <div><b>✓</b><span data-i18n="adv6">Sąskaitos-faktūros</span></div>
+            </div>
+          </div>
+          <aside class="quote-card">
+            <span class="quote-symbol">“</span>
+            <div class="stars">★★★★★</div>
+            <blockquote data-i18n="review">Greitai, kokybiškai ir labai profesionaliai. Rekomenduoju visiems!</blockquote>
+            <p>— Tomas</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section fleet" id="fleet" aria-labelledby="fleet-title">
+        <div class="container">
+          <p class="section-kicker" data-i18n="fleetKicker">Tvarkingas ir paruoštas darbui</p>
+          <h2 id="fleet-title" data-i18n="fleetTitle">Mūsų <em>autoparkas</em></h2>
+          <div class="fleet-layout">
+            <div class="van-visual"><div class="van-brand">GruZ<span>Expert</span></div><div class="van-body"></div><div class="van-cab"></div><i class="wheel one"></i><i class="wheel two"></i></div>
+            <div class="fleet-copy">
+              <h3 data-i18n="fleetName">Krovininis mikroautobusas L1/H2</h3>
+              <p data-i18n="fleetText">Tinkamas baldams, dėžėms, buitinei technikai ir daugeliui kasdienių pervežimų. Transportuojame iki 1,5 t krovinį.</p>
+              <ul><li data-i18n="fleet1">Erdvus ir švarus krovinių skyrius</li><li data-i18n="fleet2">Tvirtinimo priemonės saugiam vežimui</li><li data-i18n="fleet3">Galimybė užsakyti su krovėjais</li></ul>
+              <a href="#order" class="text-link" data-i18n="fleetCta">Užsakyti automobilį →</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section prices" id="prices" aria-labelledby="prices-title">
+        <div class="container">
+          <p class="section-kicker" data-i18n="pricesKicker">Aiškios kainos</p>
+          <h2 id="prices-title" data-i18n="pricesTitle">Tarifai <em>be staigmenų</em></h2>
+          <div class="price-grid">
+            <article class="price-card"><div class="price-icon">🚚</div><h3 data-i18n="price1">Automobilis</h3><p class="price">30 <small>€/val.</small></p><p data-i18n="price1desc">Kai reikia tik transporto</p></article>
+            <article class="price-card featured"><div class="price-icon">🚚 + 👷</div><span class="popular" data-i18n="popular">Populiariausia</span><h3 data-i18n="price2">Automobilis + 1 krovėjas</h3><p class="price">45 <small>€/val.</small></p><p data-i18n="price2desc">Patogiam pervežimui</p></article>
+            <article class="price-card"><div class="price-icon">🚚 + 👷👷</div><h3 data-i18n="price3">Automobilis + 2 krovėjai</h3><p class="price">60 <small>€/val.</small></p><p data-i18n="price3desc">Greitam perkraustymui</p></article>
+            <article class="price-card"><div class="price-icon">👷</div><h3 data-i18n="price4">Krovėjas</h3><p class="price">20 <small>€/val.</small></p><p data-i18n="price4desc">Krovimo ir nešimo darbai</p></article>
+          </div>
+          <p class="price-note" data-i18n="priceNote">Minimalus užsakymas — 2 valandos. Nestandartiniams ir tarptautiniams pervežimams kaina skaičiuojama individualiai.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer id="contacts" class="site-footer">
+      <div class="footer-map"><div class="map-grid"></div><div class="map-pin">●</div><div class="map-label" data-i18n="mapLabel">VILNIUS IR<br />APYLINKĖS</div></div>
+      <div class="container footer-content">
+        <div><a href="#top" class="brand footer-brand"><span class="brand-mark" aria-hidden="true"><i></i><b></b></span><span class="brand-name"><small>MB</small>GruZ<span>Expert</span></span></a><p data-i18n="footerTag">Krovinių pervežimas ir perkraustymo paslaugos.</p></div>
+        <div class="footer-contact"><a data-company-phone href="tel:+37066242235">☎ +370 662 42 235</a><a data-company-email href="mailto:info@gruzexpert.lt">✉ info@gruzexpert.lt</a><span>◷ 24/7</span></div>
+        <div><p class="footer-heading" data-i18n="footerArea">Aptarnaujame</p><p data-i18n="areaText">Vilnių ir apylinkes<br />Visą Lietuvą • Europą</p><a href="#order" class="button button-small" data-i18n="footerCta">Gauti kainą</a></div>
+      </div>
+      <div class="footer-bottom"><div class="container"><span>© <span id="year"></span> GruZExpert</span><a href="admin.html" data-i18n="admin">Užsakymų valdymas</a></div></div>
+    </footer>
+
+    <dialog class="service-dialog" id="service-dialog">
+      <button class="dialog-close" aria-label="Uždaryti">×</button><div id="dialog-content"></div><a href="#order" class="button dialog-order" data-i18n="dialogCta">Užsakyti paslaugą</a>
+    </dialog>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
