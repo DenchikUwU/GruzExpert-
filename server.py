@@ -120,15 +120,60 @@ def send_sms(recipient, text):
     except Exception as error:
         print(f"SMS was not sent: {error}")
         return {"sent": False, "reason": "sms_failed"}
+def send_telegram(order):
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+
+    if not token or not chat_id:
+        return {"sent": False, "error": "telegram_not_configured"}
+
+    text = (
+        "🚚 НОВА ЗАЯВКА GRUZEXPERT\n\n"
+        f"👤 Ім'я: {order.get('name', '—')}\n"
+        f"📞 Телефон: {order.get('phone', '—')}\n"
+        f"📧 Email: {order.get('email', '—')}\n\n"
+        f"📍 Звідки: {order.get('from', '—')}\n"
+        f"📍 Куди: {order.get('to', '—')}\n"
+        f"💰 Тариф: {order.get('tariff', '—')}\n"
+        f"🏠 Ліфт при завантаженні: {order.get('pickupLift', '—')}\n"
+        f"🏠 Ліфт при доставці: {order.get('deliveryLift', '—')}\n"
+        f"📅 Дата: {order.get('date', '—')}\n"
+        f"📝 Примітки: {order.get('details', '—')}"
+    )
+
+    try:
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        data = json.dumps({
+            "chat_id": chat_id,
+            "text": text
+        }).encode("utf-8")
+
+        request = urllib.request.Request(
+            url,
+            data=data,
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+
+        with urllib.request.urlopen(request, timeout=10) as response:
+            result = json.loads(response.read().decode("utf-8"))
+
+        if result.get("ok"):
+            return {"sent": True}
+
+        return {"sent": False, "error": str(result)}
+
+    except Exception as e:
+        return {"sent": False, "error": str(e)}
+
 
 def send_notifications(order):
-    company_phone = os.getenv("COMPANY_PHONE")
-    summary = f"GruZExpert: naujas užsakymas #{order['id']}\n{order_text(order)}"
-    return {
+    results = {
         "email": send_email(order),
-        "companySms": send_sms(company_phone, summary),
-        "customerSms": send_sms(order["phone"], "GruZExpert: ačiū, Jūsų užklausa gauta. Netrukus su Jumis susisieksime.")
+        "telegram": send_telegram(order),
     }
+
+    return results
 
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
