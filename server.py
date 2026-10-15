@@ -56,7 +56,44 @@ def ensure_database():
     if not DATABASE_URL:
         print("DATABASE_URL not set; using local JSON files (not durable on Render).")
         return
+
     with db_connect() as conn:
+        # Inspect an existing table before changing it. Older versions of the
+        # project may have created this table with a different schema.
+        table_exists = conn.execute("""
+            SELECT EXISTS (
+                SELECT 1 FROM information_schema.tables
+                WHERE table_schema = current_schema()
+                  AND table_name = 'gruzexpert_records'
+            )
+        """).fetchone()[0]
+
+        if table_exists:
+            columns = {
+                row[0] for row in conn.execute("""
+                    SELECT column_name FROM information_schema.columns
+                    WHERE table_schema = current_schema()
+                      AND table_name = 'gruzexpert_records'
+                """).fetchall()
+            }
+            # If the existing table is from an incompatible older schema,
+            # preserve it under a legacy name instead of deleting its rows.
+            # The application then creates a clean table with the schema it uses.
+            if not {'record_type', 'record_id'}.issubset(columns):
+                legacy_name = 'gruzexpert_records_legacy'
+                legacy_exists = conn.execute("""
+                    SELECT EXISTS (
+                        SELECT 1 FROM information_schema.tables
+                        WHERE table_schema = current_schema() AND table_name = %s
+                    )
+                """, (legacy_name,)).fetchone()[0]
+                if legacy_exists:
+                    suffix = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')
+                    legacy_name = f'gruzexpert_records_legacy_{suffix}'
+                # legacy_name is generated from a fixed prefix and UTC digits.
+                conn.execute(f'ALTER TABLE gruzexpert_records RENAME TO {legacy_name}')
+                print(f"Preserved incompatible database table as {legacy_name}; legacy rows were not deleted.")
+
         conn.execute("""CREATE TABLE IF NOT EXISTS gruzexpert_records (
             record_type TEXT NOT NULL,
             record_id TEXT NOT NULL,
@@ -64,10 +101,8 @@ def ensure_database():
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             PRIMARY KEY (record_type, record_id)
         )""")
-        # Safe compatibility migration for an older table that already exists
-        # but predates the JSONB `data` column. This adds a nullable column and
-        # does not delete or overwrite any existing rows.
         conn.execute("ALTER TABLE gruzexpert_records ADD COLUMN IF NOT EXISTS data JSONB")
+        conn.execute("ALTER TABLE gruzexpert_records ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()")
     print("PostgreSQL storage is ready (schema checked).")
 
 
