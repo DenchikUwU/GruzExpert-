@@ -1,0 +1,35 @@
+GRUZEXPERT DEPLOYMENT CHECKLIST
+
+STATIC SITE (frontend)
+- Repository: your GruZExpert GitHub repository
+- Root Directory: blank if index.html is at repository root
+- Build Command: echo "No build required"
+- Publish Directory: .
+- After API is deployed, edit config.js and set apiBaseUrl to the API Render URL, e.g. https://gruzexpert-api.onrender.com (no trailing slash), then commit and push.
+
+WEB SERVICE (API; required for forms/admin/Telegram)
+- Same GitHub repository
+- Root Directory: blank
+- Build Command: pip install -r requirements.txt
+- Start Command: python server.py
+- Add environment variables:
+  GRUZEXPERT_ADMIN_KEY = a long unique secret password
+  TELEGRAM_BOT_TOKEN = token from BotFather (optional until configured)
+  TELEGRAM_CHAT_ID = your chat ID (optional until configured)
+  ALLOWED_ORIGINS = exact Static Site URL, e.g. https://gruzexpert.onrender.com
+  DATABASE_URL = Internal Database URL copied from your Render PostgreSQL database
+- Do not commit secrets or put them in config.js.
+
+DATABASE
+- Create a PostgreSQL database in Render and copy its INTERNAL DATABASE URL to the Web Service's DATABASE_URL.
+- PostgreSQL storage is used automatically when DATABASE_URL is set. Without it, the API falls back to local JSON files, which are NOT durable on a normal Render Web Service.
+
+TELEGRAM
+- Create a bot with @BotFather, open the bot and press Start, obtain chat ID, then set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in the Web Service Environment.
+
+ADMIN
+- Open https://YOUR-STATIC-SITE.onrender.com/admin.html
+- Enter the GRUZEXPERT_ADMIN_KEY value. It is sent to the API as X-Admin-Key; it is not embedded in public code.
+
+NOTE
+- Static Site cannot run server.py. Both the Static Site and API Web Service are needed to keep the site static while supporting orders/admin/reviews.

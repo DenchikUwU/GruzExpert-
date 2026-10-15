@@ -13,7 +13,6 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlencode, urlparse
 from urllib.request import Request, urlopen
-import urllib.request
 
 ROOT = Path(__file__).resolve().parent
 ENV_FILE = ROOT / ".env"
@@ -36,7 +35,35 @@ ADMIN_KEY = os.getenv("GRUZEXPERT_ADMIN_KEY", "")
 MAX_BODY = 20_000
 REQUIRED_FIELDS = ("from", "to", "name", "phone", "email", "pickupLift", "deliveryLift", "tariff")
 
+def database_url():
+    value = os.getenv("DATABASE_URL", "").strip()
+    if value.startswith("postgres://"):
+        value = "postgresql://" + value[len("postgres://"):]
+    return value
+
+def db_connect():
+    url = database_url()
+    if not url:
+        return None
+    try:
+        import psycopg
+    except ImportError as exc:
+        raise RuntimeError("DATABASE_URL is set but psycopg is not installed") from exc
+    return psycopg.connect(url, connect_timeout=10)
+
+def init_database():
+    if not database_url():
+        return
+    with db_connect() as conn:
+        conn.execute("CREATE TABLE IF NOT EXISTS gruzexpert_records (kind TEXT NOT NULL, id TEXT NOT NULL, payload JSONB NOT NULL, PRIMARY KEY(kind, id))")
+        conn.commit()
+
 def read_records(file_path):
+    kind = "orders" if file_path == ORDERS_FILE else "reviews"
+    if database_url():
+        with db_connect() as conn:
+            rows = conn.execute("SELECT payload FROM gruzexpert_records WHERE kind=%s ORDER BY (payload->>'createdAt') DESC NULLS LAST", (kind,)).fetchall()
+            return [row[0] for row in rows]
     try:
         with file_path.open(encoding="utf-8") as file:
             records = json.load(file)
@@ -45,7 +72,15 @@ def read_records(file_path):
         return []
 
 def write_records(file_path, records):
-    file_path.parent.mkdir(exist_ok=True)
+    kind = "orders" if file_path == ORDERS_FILE else "reviews"
+    if database_url():
+        with db_connect() as conn:
+            conn.execute("DELETE FROM gruzexpert_records WHERE kind=%s", (kind,))
+            for record in records:
+                conn.execute("INSERT INTO gruzexpert_records(kind,id,payload) VALUES (%s,%s,%s::jsonb) ON CONFLICT(kind,id) DO UPDATE SET payload=EXCLUDED.payload", (kind, str(record.get("id", secrets.token_urlsafe(10))), json.dumps(record, ensure_ascii=False)))
+            conn.commit()
+        return
+    file_path.parent.mkdir(parents=True, exist_ok=True)
     temp_file = file_path.with_suffix(".tmp")
     with temp_file.open("w", encoding="utf-8") as file:
         json.dump(records, file, ensure_ascii=False, indent=2)
@@ -149,14 +184,14 @@ def send_telegram(order):
             "text": text
         }).encode("utf-8")
 
-        request = urllib.request.Request(
+        request = Request(
             url,
             data=data,
             headers={"Content-Type": "application/json"},
             method="POST"
         )
 
-        with urllib.request.urlopen(request, timeout=10) as response:
+        with urlopen(request, timeout=10) as response:
             result = json.loads(response.read().decode("utf-8"))
 
         if result.get("ok"):
@@ -179,6 +214,20 @@ def send_notifications(order):
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ROOT), **kwargs)
+
+    def end_headers(self):
+        origin = self.headers.get("Origin", "")
+        allowed = [item.strip() for item in os.getenv("ALLOWED_ORIGINS", "").split(",") if item.strip()]
+        if origin and origin in allowed:
+            self.send_header("Access-Control-Allow-Origin", origin)
+            self.send_header("Vary", "Origin")
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Admin-Key")
+        super().end_headers()
+
+    def do_OPTIONS(self):
+        self.send_response(HTTPStatus.NO_CONTENT)
+        self.end_headers()
 
     def json_response(self, status, payload):
         data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
@@ -272,6 +321,7 @@ class Handler(SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     if not ADMIN_KEY:
         print("WARNING: set GRUZEXPERT_ADMIN_KEY before placing the site online; admin access is disabled.")
+    init_database()
     port = int(os.getenv("PORT", "8000"))
     print(f"GruZExpert is running on http://localhost:{port}")
     ThreadingHTTPServer(("", port), Handler).serve_forever()

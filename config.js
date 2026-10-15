@@ -1,5 +1,6 @@
-/* Replace these public temporary details before publishing. SMTP credentials must never be placed here. */
+/* Public website settings. Set apiBaseUrl to your deployed Render API URL (no trailing slash). Never put passwords or bot tokens here. */
 window.GRUZEXPERT_CONFIG = {
+  apiBaseUrl: '',
   phoneDisplay: '+370 662 42 235',
   phoneHref: 'tel:+37066242235',
   email: 'gruzexpertlt@gmail.com',

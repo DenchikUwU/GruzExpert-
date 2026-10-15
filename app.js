@@ -21,6 +21,8 @@ let language = localStorage.getItem('gruzexpert-language') || 'lt';
 const get = (key) => copy[language][key] ?? copy.lt[key] ?? key;
 function loadPublicConfig() {
   const config = window.GRUZEXPERT_CONFIG || {};
+const API_BASE_URL = String(config.apiBaseUrl || '').replace(/\/$/, '');
+const apiUrl = path => `${API_BASE_URL}${path}`;
   if (config.heroImage) document.documentElement.style.setProperty('--hero-photo', config.heroImage);
   if (config.mapImage) document.documentElement.style.setProperty('--map-photo', config.mapImage);
   document.querySelectorAll('[data-company-phone]').forEach(link => {
@@ -58,7 +60,7 @@ function renderReviews() {
   list.innerHTML = reviews.map(review => `<article class="review-card"><header><h3>${escapeHtml(review.name)}</h3><span class="stars" aria-label="${review.rating} iš 5">${'★'.repeat(Number(review.rating))}${'☆'.repeat(5 - Number(review.rating))}</span></header><p>${escapeHtml(review.text)}</p></article>`).join('');
 }
 async function loadReviews() {
-  try { const response = await fetch('/api/reviews'); if (!response.ok) throw new Error(); reviews = await response.json(); }
+  try { const response = await fetch(apiUrl('/api/reviews')); if (!response.ok) throw new Error(); reviews = await response.json(); }
   catch { reviews = []; }
   renderReviews();
 }
@@ -68,12 +70,12 @@ reviewForm.addEventListener('submit', async event => {
   if (!reviewForm.checkValidity()) { reviewForm.reportValidity(); return; }
   const submit = reviewForm.querySelector('[type=submit]'); submit.disabled = true; status.textContent = '';
   try {
-    const response = await fetch('/api/reviews', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.fromEntries(new FormData(reviewForm).entries())) });
+    const response = await fetch(apiUrl('/api/reviews'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.fromEntries(new FormData(reviewForm).entries())) });
     if (!response.ok) throw new Error(); reviewForm.reset(); await loadReviews(); status.className='form-status success'; status.textContent=get('reviewSent');
   } catch { status.className='form-status error'; status.textContent=get('reviewError'); }
   finally { submit.disabled = false; }
 });
 const form=document.getElementById('order-form');
-form.addEventListener('submit',async event=>{event.preventDefault(); const status=form.querySelector('.form-status'); if(!form.checkValidity()){form.reportValidity();return;} const payload=Object.fromEntries(new FormData(form).entries()); payload.language=language; const submit=form.querySelector('[type=submit]'); submit.disabled=true; status.textContent=''; try { const response=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); if(response.status === 202) { form.reset(); status.className='form-status error'; status.textContent=get('deliveryPending'); return; } if(!response.ok)throw new Error(); form.reset();status.className='form-status success';status.textContent=get('sent'); } catch { status.className='form-status error';status.textContent=location.protocol === 'file:' ? get('serverRequired') : get('error'); } finally { submit.disabled=false; }});
+form.addEventListener('submit',async event=>{event.preventDefault(); const status=form.querySelector('.form-status'); if(!form.checkValidity()){form.reportValidity();return;} const payload=Object.fromEntries(new FormData(form).entries()); payload.language=language; const submit=form.querySelector('[type=submit]'); submit.disabled=true; status.textContent=''; try { const response=await fetch(apiUrl('/api/orders'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); if(response.status === 202) { form.reset(); status.className='form-status error'; status.textContent=get('deliveryPending'); return; } if(!response.ok)throw new Error(); form.reset();status.className='form-status success';status.textContent=get('sent'); } catch { status.className='form-status error';status.textContent=location.protocol === 'file:' ? get('serverRequired') : get('error'); } finally { submit.disabled=false; }});
 localize();
 loadReviews();

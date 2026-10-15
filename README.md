@@ -1,30 +1,14 @@
 # GruZExpert
 
-Responsive website for cargo transport and moving services. Lithuanian is the default language; Russian and English are built in. Orders and reviews are saved locally as JSON files.
+Responsive static frontend for GruZExpert with a Python API for orders, reviews, administrator access and Telegram notifications.
 
-## Start locally
+## Render architecture
+- Deploy the frontend as a Render Static Site (Publish Directory `.`).
+- Deploy `server.py` as a separate Render Web Service (`pip install -r requirements.txt`, `python server.py`).
+- Create a Render PostgreSQL database and set its Internal Database URL as `DATABASE_URL` on the Web Service.
+- Set `GRUZEXPERT_ADMIN_KEY`, `ALLOWED_ORIGINS`, and optionally `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` in the Web Service Environment.
+- Set `apiBaseUrl` in `config.js` to the API Web Service URL and push that change to GitHub.
+- Detailed steps are in `render-deploy-guide.txt`.
 
-```sh
-cp .env.example .env
-# Enter the real settings in .env, then:
-python3 server.py
-```
-
-Open `http://localhost:8000`. Orders are stored in `data/orders.json`; reviews in `data/reviews.json`. The protected order-management page is `/admin.html`.
-
-## Send an email for every order
-
-Email and SMS are sent only after the private `.env` settings have been completed. Copy `.env.example` to `.env`, add the real recipient email, company phone, SMTP details and Twilio details. The website never exposes these credentials to visitors.
-
-```sh
-cp .env.example .env
-# Edit .env, then run:
-python3 server.py
-```
-
-## Before publishing
-
-1. Add the real phone and public email in `config.js`.
-2. Fill in `.env` with a long `GRUZEXPERT_ADMIN_KEY`. The recipient e-mail and company phone are prefilled for GruZExpert; change them only if needed.
-3. Add SMTP settings to receive an e-mail for each order, and Twilio settings to receive the order by SMS and automatically confirm it to the customer.
-4. Configure HTTPS in the hosting provider's environment settings.
+## Local run
+Install requirements with `pip install -r requirements.txt`, set `GRUZEXPERT_ADMIN_KEY` in your shell, and run `python server.py`. Without `DATABASE_URL`, local JSON storage is used under `data/`; on Render this fallback is not durable unless a persistent disk is configured.
