@@ -60,11 +60,15 @@ def ensure_database():
         conn.execute("""CREATE TABLE IF NOT EXISTS gruzexpert_records (
             record_type TEXT NOT NULL,
             record_id TEXT NOT NULL,
-            data JSONB NOT NULL,
+            data JSONB,
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             PRIMARY KEY (record_type, record_id)
         )""")
-    print("PostgreSQL storage is ready.")
+        # Safe compatibility migration for an older table that already exists
+        # but predates the JSONB `data` column. This adds a nullable column and
+        # does not delete or overwrite any existing rows.
+        conn.execute("ALTER TABLE gruzexpert_records ADD COLUMN IF NOT EXISTS data JSONB")
+    print("PostgreSQL storage is ready (schema checked).")
 
 
 def db_read_records(record_type):
@@ -78,7 +82,9 @@ def db_read_records(record_type):
 
 def db_write_records(record_type, records):
     with db_connect() as conn:
-        conn.execute("DELETE FROM gruzexpert_records WHERE record_type = %s", (record_type,))
+        # Keep legacy rows with NULL data intact; they may contain records in
+        # an older schema that this version cannot safely reinterpret.
+        conn.execute("DELETE FROM gruzexpert_records WHERE record_type = %s AND data IS NOT NULL", (record_type,))
         for record in records:
             conn.execute(
                 "INSERT INTO gruzexpert_records (record_type, record_id, data) VALUES (%s, %s, %s) "
