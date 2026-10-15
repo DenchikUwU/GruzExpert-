@@ -13,6 +13,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlencode, urlparse
 from urllib.request import Request, urlopen
+import urllib.request
 
 ROOT = Path(__file__).resolve().parent
 ENV_FILE = ROOT / ".env"
