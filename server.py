@@ -34,36 +34,59 @@ REVIEWS_FILE = ROOT / "data" / "reviews.json"
 ADMIN_KEY = os.getenv("GRUZEXPERT_ADMIN_KEY", "")
 MAX_BODY = 20_000
 REQUIRED_FIELDS = ("from", "to", "name", "phone", "email", "pickupLift", "deliveryLift", "tariff")
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+FRONTEND_ORIGINS = {"https://gruzexpert.onrender.com", "http://localhost:8000", "http://127.0.0.1:8000"}
+try:
+    import psycopg
+    from psycopg.types.json import Jsonb
+except ImportError:
+    psycopg = None
+    Jsonb = None
 
-def database_url():
-    value = os.getenv("DATABASE_URL", "").strip()
-    if value.startswith("postgres://"):
-        value = "postgresql://" + value[len("postgres://"):]
-    return value
 
 def db_connect():
-    url = database_url()
-    if not url:
+    if not DATABASE_URL:
         return None
-    try:
-        import psycopg
-    except ImportError as exc:
-        raise RuntimeError("DATABASE_URL is set but psycopg is not installed") from exc
-    return psycopg.connect(url, connect_timeout=10)
+    if psycopg is None:
+        raise RuntimeError("DATABASE_URL is set but psycopg is not installed")
+    return psycopg.connect(DATABASE_URL)
 
-def init_database():
-    if not database_url():
+
+def ensure_database():
+    if not DATABASE_URL:
+        print("DATABASE_URL not set; using local JSON files (not durable on Render).")
         return
     with db_connect() as conn:
-        conn.execute("CREATE TABLE IF NOT EXISTS gruzexpert_records (kind TEXT NOT NULL, id TEXT NOT NULL, payload JSONB NOT NULL, PRIMARY KEY(kind, id))")
-        conn.commit()
+        conn.execute("""CREATE TABLE IF NOT EXISTS gruzexpert_records (
+            record_type TEXT NOT NULL,
+            record_id TEXT NOT NULL,
+            data JSONB NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            PRIMARY KEY (record_type, record_id)
+        )""")
+    print("PostgreSQL storage is ready.")
+
+
+def db_read_records(record_type):
+    with db_connect() as conn:
+        rows = conn.execute(
+            "SELECT data FROM gruzexpert_records WHERE record_type = %s ORDER BY created_at ASC",
+            (record_type,)
+        ).fetchall()
+        return [row[0] for row in rows]
+
+
+def db_write_records(record_type, records):
+    with db_connect() as conn:
+        conn.execute("DELETE FROM gruzexpert_records WHERE record_type = %s", (record_type,))
+        for record in records:
+            conn.execute(
+                "INSERT INTO gruzexpert_records (record_type, record_id, data) VALUES (%s, %s, %s) "
+                "ON CONFLICT (record_type, record_id) DO UPDATE SET data = EXCLUDED.data, created_at = NOW()",
+                (record_type, str(record["id"]), Jsonb(record))
+            )
 
 def read_records(file_path):
-    kind = "orders" if file_path == ORDERS_FILE else "reviews"
-    if database_url():
-        with db_connect() as conn:
-            rows = conn.execute("SELECT payload FROM gruzexpert_records WHERE kind=%s ORDER BY (payload->>'createdAt') DESC NULLS LAST", (kind,)).fetchall()
-            return [row[0] for row in rows]
     try:
         with file_path.open(encoding="utf-8") as file:
             records = json.load(file)
@@ -72,31 +95,29 @@ def read_records(file_path):
         return []
 
 def write_records(file_path, records):
-    kind = "orders" if file_path == ORDERS_FILE else "reviews"
-    if database_url():
-        with db_connect() as conn:
-            conn.execute("DELETE FROM gruzexpert_records WHERE kind=%s", (kind,))
-            for record in records:
-                conn.execute("INSERT INTO gruzexpert_records(kind,id,payload) VALUES (%s,%s,%s::jsonb) ON CONFLICT(kind,id) DO UPDATE SET payload=EXCLUDED.payload", (kind, str(record.get("id", secrets.token_urlsafe(10))), json.dumps(record, ensure_ascii=False)))
-            conn.commit()
-        return
-    file_path.parent.mkdir(parents=True, exist_ok=True)
+    file_path.parent.mkdir(exist_ok=True)
     temp_file = file_path.with_suffix(".tmp")
     with temp_file.open("w", encoding="utf-8") as file:
         json.dump(records, file, ensure_ascii=False, indent=2)
     temp_file.replace(file_path)
 
 def read_orders():
-    return read_records(ORDERS_FILE)
+    return db_read_records("order") if DATABASE_URL else read_records(ORDERS_FILE)
 
 def write_orders(records):
-    write_records(ORDERS_FILE, records)
+    if DATABASE_URL:
+        db_write_records("order", records)
+    else:
+        write_records(ORDERS_FILE, records)
 
 def read_reviews():
-    return read_records(REVIEWS_FILE)
+    return db_read_records("review") if DATABASE_URL else read_records(REVIEWS_FILE)
 
 def write_reviews(records):
-    write_records(REVIEWS_FILE, records)
+    if DATABASE_URL:
+        db_write_records("review", records)
+    else:
+        write_records(REVIEWS_FILE, records)
 
 def order_text(order):
     labels = {
@@ -215,24 +236,16 @@ class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
-    def end_headers(self):
-        origin = self.headers.get("Origin", "")
-        allowed = [item.strip() for item in os.getenv("ALLOWED_ORIGINS", "").split(",") if item.strip()]
-        if origin and origin in allowed:
-            self.send_header("Access-Control-Allow-Origin", origin)
-            self.send_header("Vary", "Origin")
-            self.send_header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
-            self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Admin-Key")
-        super().end_headers()
-
-    def do_OPTIONS(self):
-        self.send_response(HTTPStatus.NO_CONTENT)
-        self.end_headers()
-
     def json_response(self, status, payload):
         data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
+        origin = self.headers.get("Origin", "")
+        if origin in FRONTEND_ORIGINS:
+            self.send_header("Access-Control-Allow-Origin", origin)
+            self.send_header("Vary", "Origin")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Admin-Key")
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
         self.send_header("Content-Length", str(len(data)))
         self.end_headers()
         self.wfile.write(data)
@@ -280,6 +293,17 @@ class Handler(SimpleHTTPRequestHandler):
         records = read_reviews(); records.insert(0, item); write_reviews(records)
         return self.json_response(HTTPStatus.CREATED, {"ok": True, "id": item["id"]})
 
+    def do_OPTIONS(self):
+        self.send_response(HTTPStatus.NO_CONTENT)
+        origin = self.headers.get("Origin", "")
+        if origin in FRONTEND_ORIGINS:
+            self.send_header("Access-Control-Allow-Origin", origin)
+            self.send_header("Vary", "Origin")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Admin-Key")
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
     def do_POST(self):
         path = urlparse(self.path).path
         body = self.request_json()
@@ -321,7 +345,7 @@ class Handler(SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     if not ADMIN_KEY:
         print("WARNING: set GRUZEXPERT_ADMIN_KEY before placing the site online; admin access is disabled.")
-    init_database()
     port = int(os.getenv("PORT", "8000"))
-    print(f"GruZExpert is running on http://localhost:{port}")
-    ThreadingHTTPServer(("", port), Handler).serve_forever()
+    ensure_database()
+    print(f"GruZExpert is running on 0.0.0.0:{port}")
+    ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()

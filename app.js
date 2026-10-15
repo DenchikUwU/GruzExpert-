@@ -19,10 +19,10 @@ const services = {
 
 let language = localStorage.getItem('gruzexpert-language') || 'lt';
 const get = (key) => copy[language][key] ?? copy.lt[key] ?? key;
+const config = window.GRUZEXPERT_CONFIG || {};
+const API_BASE = String(config.apiBaseUrl || '').replace(/\/$/, '');
+const apiUrl = path => `${API_BASE}${path}`;
 function loadPublicConfig() {
-  const config = window.GRUZEXPERT_CONFIG || {};
-const API_BASE_URL = String(config.apiBaseUrl || '').replace(/\/$/, '');
-const apiUrl = path => `${API_BASE_URL}${path}`;
   if (config.heroImage) document.documentElement.style.setProperty('--hero-photo', config.heroImage);
   if (config.mapImage) document.documentElement.style.setProperty('--map-photo', config.mapImage);
   document.querySelectorAll('[data-company-phone]').forEach(link => {
