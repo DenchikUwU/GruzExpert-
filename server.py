@@ -163,7 +163,7 @@ def write_reviews(records):
 def order_text(order):
     labels = {
         "from": "Iš kur", "to": "Į kur", "name": "Klientas", "phone": "Telefonas",
-        "email": "El. paštas", "date": "Data", "pickupLift": "Liftas paėmime",
+        "email": "El. paštas", "date": "Data", "loadingTime": "Время загрузки", "deliveryTime": "Время доставки", "pickupLift": "Liftas paėmime",
         "deliveryLift": "Liftas pristatyme", "tariff": "Tarifas", "details": "Pastabos",
         "createdAt": "Gauta", "language": "Svetainės kalba"
     }
@@ -236,6 +236,8 @@ def send_telegram(order):
         f"🏠 Ліфт при завантаженні: {order.get('pickupLift', '—')}\n"
         f"🏠 Ліфт при доставці: {order.get('deliveryLift', '—')}\n"
         f"📅 Дата: {order.get('date', '—')}\n"
+        f"⏰ Время загрузки: {order.get('loadingTime', '—')}\n"
+        f"⏰ Время доставки: {order.get('deliveryTime', '—')}\n"
         f"📝 Примітки: {order.get('details', '—')}"
     )
 
