@@ -44,12 +44,12 @@ function localize() {
   renderReviews();
   loadPublicConfig();
 }
-function renderServices() { document.getElementById('service-grid').innerHTML = services[language].map((service,index) => `<button class="service-card" data-service="${index}"><span class="service-icon">${service[0]}</span><h3>${service[1]}</h3><p>${service[2]}</p><span class="more">+</span></button>`).join(''); }
+function renderServices() { document.getElementById('service-grid').innerHTML = services[language].map((service,index) => `<button class="service-card" data-service="${index}"><img class="service-photo" src="service-${String(index%10+1).padStart(2,'0')}.jpg" alt="${service[1]}" loading="lazy"><span class="service-card-copy"><h3>${service[1]}</h3><p>${service[2]}</p></span></button>`).join(''); }
 document.querySelectorAll('.language').forEach(button => button.addEventListener('click',() => { language=button.dataset.lang;localStorage.setItem('gruzexpert-language',language);localize(); }));
 const menu = document.querySelector('.menu-toggle'); const nav=document.querySelector('.main-nav');
 menu.addEventListener('click',()=>{const isOpen=nav.classList.toggle('open');menu.setAttribute('aria-expanded',isOpen);}); nav.addEventListener('click',()=>{nav.classList.remove('open');menu.setAttribute('aria-expanded','false');});
 const dialog=document.getElementById('service-dialog');
-document.getElementById('service-grid').addEventListener('click', event=>{const card=event.target.closest('.service-card');if(!card)return;const item=services[language][card.dataset.service];const photoPositions=['0 0','50% 0','100% 0','0 100%','50% 100%','100% 100%'];dialog.style.setProperty('--dialog-position',photoPositions[Number(card.dataset.service)%photoPositions.length]);document.getElementById('dialog-content').innerHTML=`<div class="dialog-icon">${item[0]}</div><h3>${item[1]}</h3><p>${item[3]}</p><ul>${item[4].map(point=>`<li>${point}</li>`).join('')}</ul>`;dialog.showModal();});
+document.getElementById('service-grid').addEventListener('click', event=>{const card=event.target.closest('.service-card');if(!card)return;const item=services[language][card.dataset.service];const photoPositions=['0 0','50% 0','100% 0','0 100%','50% 100%','100% 100%'];dialog.style.setProperty('--dialog-position',photoPositions[Number(card.dataset.service)%photoPositions.length]);document.getElementById('dialog-content').innerHTML=`<h3>${item[1]}</h3><p>${item[3]}</p><ul>${item[4].map(point=>`<li>${point}</li>`).join('')}</ul>`;dialog.showModal();});
 dialog.querySelector('.dialog-close').addEventListener('click',()=>dialog.close()); dialog.querySelector('.dialog-order').addEventListener('click',()=>dialog.close());
 document.getElementById('year').textContent = new Date().getFullYear();
 let reviews = [];

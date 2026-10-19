@@ -495,3 +495,14 @@ body { background:#fff; color:#151515; }
 .service-dialog { background-image:none; }
 @media(max-width:850px) { .service-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .service-photo { height:160px; } .price-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:520px) { .service-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } .service-photo { height:125px; } .service-card-copy { padding:12px 10px 14px; } .service-card h3 { font-size:11px; } .service-card p { font-size:10px; } .price-card { padding:17px 12px; } .price { font-size:30px; } }
+
+
+/* Final image path + clean photo cards: no sticker badges or decorative icons */
+.service-card .service-icon, .service-card .more, .price-icon, .popular, .service-badge, .sticker, .sticker-icon { display:none !important; }
+.service-card { position:relative; z-index:0; }
+.service-photo { position:relative; z-index:0; height:190px; object-fit:cover; object-position:center; filter:brightness(1.12) saturate(1.08) contrast(1.02); }
+.price-card { padding:0 0 20px; overflow:hidden; }
+.price-photo { display:block; width:100%; height:145px; object-fit:cover; object-position:center; filter:brightness(1.12) saturate(1.08) contrast(1.02); border-bottom:5px solid #ffca05; }
+.price-card h3, .price-card .price, .price-card p:last-child { margin-left:18px; margin-right:18px; }
+.price-card h3 { margin-top:17px; }
+@media(max-width:520px) { .service-photo { height:125px; } .price-photo { height:105px; } .price-card h3, .price-card .price, .price-card p:last-child { margin-left:10px; margin-right:10px; } }
