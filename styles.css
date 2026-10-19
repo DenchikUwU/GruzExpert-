@@ -506,3 +506,78 @@ body { background:#fff; color:#151515; }
 .price-card h3, .price-card .price, .price-card p:last-child { margin-left:18px; margin-right:18px; }
 .price-card h3 { margin-top:17px; }
 @media(max-width:520px) { .service-photo { height:125px; } .price-photo { height:105px; } .price-card h3, .price-card .price, .price-card p:last-child { margin-left:10px; margin-right:10px; } }
+
+/* Wide-screen adaptation and consistent black/orange industrial stripe accents */
+:root { --accent-orange:#ffbf00; }
+html, body { max-width:100%; overflow-x:clip; }
+.container { width:min(1480px, calc(100% - 64px)); }
+
+/* Keep the page visually branded on every section without covering content */
+.section,
+.quick-order,
+.site-footer { isolation:isolate; }
+.section::before,
+.section::after,
+.quick-order::before,
+.site-footer::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  pointer-events:none;
+  height:10px;
+  left:0;
+  right:0;
+  background:repeating-linear-gradient(135deg,#171717 0 18px,#ffbf00 18px 28px,#171717 28px 46px);
+}
+.section { position:relative; }
+.section::before { top:0; }
+.section::after { bottom:0; }
+.quick-order::before { top:0; }
+.site-footer::before { top:0; }
+
+@media (min-width:1500px) {
+  .container { width:min(1600px, calc(100% - 100px)); }
+  .site-header { height:90px; }
+  .nav-wrap { gap:38px; }
+  .main-nav { gap:clamp(18px,1.5vw,30px); font-size:13px; }
+  .hero { min-height:clamp(560px,42vw,720px); }
+  .hero-content { padding-top:clamp(100px,7vw,145px); padding-bottom:90px; }
+  .hero h1 { font-size:clamp(52px,4vw,76px); max-width:900px; }
+  .hero-copy { max-width:650px; font-size:18px; }
+  .hero-points { font-size:14px; gap:22px; }
+  .section { padding:clamp(100px,6vw,135px) 0; }
+  .section h2 { font-size:clamp(42px,3vw,56px); }
+  .section-lead { font-size:16px; margin-bottom:46px; }
+  .order-layout { grid-template-columns:minmax(300px,.72fr) minmax(0,1.8fr); }
+  .order-intro { padding:45px; }
+  .order-intro h2 { font-size:36px; }
+  .order-form { padding:38px 42px 30px; gap:15px; }
+  .service-grid { grid-template-columns:repeat(5,minmax(0,1fr)); }
+  .service-card { min-height:220px; padding:28px 24px; }
+  .service-photo { height:clamp(190px,14vw,250px); }
+  .advantages-layout { grid-template-columns:minmax(0,1.3fr) minmax(360px,.7fr); gap:clamp(70px,7vw,130px); }
+  .advantage-list { gap:20px 34px; }
+  .advantage-list div { font-size:15px; }
+  .fleet-layout { gap:clamp(70px,7vw,130px); }
+  .van-visual { height:360px; transform:scale(1.1); }
+  .fleet-copy h3 { font-size:30px; }
+  .fleet-copy p { font-size:16px; }
+  .price-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:22px; }
+  .price-photo { height:clamp(160px,12vw,220px); }
+  .price-card h3 { font-size:14px; }
+  .price { font-size:50px; }
+  .footer-content { min-height:320px; gap:clamp(50px,5vw,90px); }
+}
+
+@media (min-width:1900px) {
+  .container { width:min(1720px, calc(100% - 140px)); }
+  .service-grid { grid-template-columns:repeat(5,minmax(0,1fr)); }
+}
+
+@media (max-width:1050px) {
+  .container { width:calc(100% - 48px); }
+}
+@media (max-width:560px) {
+  .container { width:calc(100% - 30px); }
+  .section::before, .section::after, .quick-order::before, .site-footer::before { height:7px; }
+}
