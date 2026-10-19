@@ -35,7 +35,7 @@ ADMIN_KEY = os.getenv("GRUZEXPERT_ADMIN_KEY", "")
 MAX_BODY = 20_000
 REQUIRED_FIELDS = ("from", "to", "name", "phone", "email", "pickupLift", "deliveryLift", "tariff")
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
-FRONTEND_ORIGINS = {"https://gruzexpert.onrender.com", "http://localhost:8000", "http://127.0.0.1:8000"}
+FRONTEND_ORIGINS = {"https://gruzexpert.onrender.com", "https://gruzexpert.lt" "http://localhost:8000", "http://127.0.0.1:8000"}
 try:
     import psycopg
     from psycopg.types.json import Jsonb
