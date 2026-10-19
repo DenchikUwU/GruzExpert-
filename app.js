@@ -49,28 +49,7 @@ document.querySelectorAll('.language').forEach(button => button.addEventListener
 const menu = document.querySelector('.menu-toggle'); const nav=document.querySelector('.main-nav');
 menu.addEventListener('click',()=>{const isOpen=nav.classList.toggle('open');menu.setAttribute('aria-expanded',isOpen);}); nav.addEventListener('click',()=>{nav.classList.remove('open');menu.setAttribute('aria-expanded','false');});
 const dialog=document.getElementById('service-dialog');
-const servicePhotos = [
-  "url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=85')",
-  "url('https://images.unsplash.com/photo-1600518464441-9154a4dea21b?auto=format&fit=crop&w=1200&q=85')",
-  "url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85')",
-  "url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85')",
-  "url('https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=85')",
-  "url('https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=85')",
-  "url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=85')",
-  "url('https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1200&q=85')",
-  "url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=85')",
-  "url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=85')",
-  "url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85')",
-  "url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=85')"
-];
-document.getElementById('service-grid').addEventListener('click', event=>{
-  const card=event.target.closest('.service-card'); if(!card)return;
-  const index=Number(card.dataset.service); const item=services[language][index];
-  const content=document.getElementById('dialog-content');
-  content.style.setProperty('--service-image', servicePhotos[index] || servicePhotos[0]);
-  content.innerHTML=`<div class="dialog-icon">${item[0]}</div><h3>${item[1]}</h3><p>${item[3]}</p><ul>${item[4].map(point=>`<li>${point}</li>`).join('')}</ul>`;
-  dialog.showModal();
-});
+document.getElementById('service-grid').addEventListener('click', event=>{const card=event.target.closest('.service-card');if(!card)return;const item=services[language][card.dataset.service];document.getElementById('dialog-content').innerHTML=`<div class="dialog-icon">${item[0]}</div><h3>${item[1]}</h3><p>${item[3]}</p><ul>${item[4].map(point=>`<li>${point}</li>`).join('')}</ul>`;dialog.showModal();});
 dialog.querySelector('.dialog-close').addEventListener('click',()=>dialog.close()); dialog.querySelector('.dialog-order').addEventListener('click',()=>dialog.close());
 document.getElementById('year').textContent = new Date().getFullYear();
 let reviews = [];
