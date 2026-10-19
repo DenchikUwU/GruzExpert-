@@ -44,22 +44,12 @@ function localize() {
   renderReviews();
   loadPublicConfig();
 }
-function renderServices() { document.getElementById('service-grid').innerHTML = services[language].map((service,index) => `<button class="service-card" data-service="${index}" aria-haspopup="dialog"><span class="service-icon" aria-hidden="true">${service[0]}</span><h3>${service[1]}</h3><span class="more">+</span></button>`).join(''); }
+function renderServices() { document.getElementById('service-grid').innerHTML = services[language].map((service,index) => `<button class="service-card" data-service="${index}"><span class="service-icon">${service[0]}</span><h3>${service[1]}</h3><p>${service[2]}</p><span class="more">+</span></button>`).join(''); }
 document.querySelectorAll('.language').forEach(button => button.addEventListener('click',() => { language=button.dataset.lang;localStorage.setItem('gruzexpert-language',language);localize(); }));
 const menu = document.querySelector('.menu-toggle'); const nav=document.querySelector('.main-nav');
 menu.addEventListener('click',()=>{const isOpen=nav.classList.toggle('open');menu.setAttribute('aria-expanded',isOpen);}); nav.addEventListener('click',()=>{nav.classList.remove('open');menu.setAttribute('aria-expanded','false');});
 const dialog=document.getElementById('service-dialog');
-const servicePhotos = [
-  'https://images.unsplash.com/photo-1600518464441-9154a4DEA21b?auto=format&fit=crop&w=1200&q=85',
-  'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=85',
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85',
-  'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85',
-  'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=85',
-  'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=1200&q=85',
-  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1200&q=85',
-  'https://images.unsplash.com/photo-1590247813693-5541d1c609fd?auto=format&fit=crop&w=1200&q=85'
-];
-document.getElementById('service-grid').addEventListener('click', event=>{const card=event.target.closest('.service-card');if(!card)return;const index=Number(card.dataset.service);const item=services[language][index];dialog.style.setProperty('--dialog-photo', `url("${servicePhotos[index % servicePhotos.length]}")`);document.getElementById('dialog-content').innerHTML=`<div class="dialog-icon">${item[0]}</div><h3>${item[1]}</h3><p>${item[3]}</p><ul>${item[4].map(point=>`<li>${point}</li>`).join('')}</ul>`;dialog.showModal();});
+document.getElementById('service-grid').addEventListener('click', event=>{const card=event.target.closest('.service-card');if(!card)return;const item=services[language][card.dataset.service];document.getElementById('dialog-content').innerHTML=`<div class="dialog-icon">${item[0]}</div><h3>${item[1]}</h3><p>${item[3]}</p><ul>${item[4].map(point=>`<li>${point}</li>`).join('')}</ul>`;dialog.showModal();});
 dialog.querySelector('.dialog-close').addEventListener('click',()=>dialog.close()); dialog.querySelector('.dialog-order').addEventListener('click',()=>dialog.close());
 document.getElementById('year').textContent = new Date().getFullYear();
 let reviews = [];
