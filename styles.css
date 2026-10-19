@@ -386,3 +386,32 @@ body { background:#0b0b0b; color:#f7f7f7; }
   .price { font-size:35px; }
   .price-card h3 { font-size:11px; }
 }
+
+
+/* Follow-up refinement: restore light site surfaces while keeping black/yellow cards */
+body { background:#fff; color:#171717; }
+.site-header { background:#fff; color:#171717; border-bottom:1px solid #e7e7e7; }
+.main-nav a, .phone-link { color:#171717; }
+.language-picker { border-left-color:#e3e3e3; }
+.language { color:#666; }
+.services { background:#fff; color:#171717; }
+.services .section-kicker, .services .section-lead { color:#555; }
+.services .section h2, .services h2 { color:#171717; }
+/* Preserve the custom black/yellow service-card artwork and the dark photo-based tariffs. */
+.prices { background:#101010; color:#fff; }
+/* Ensure form controls remain readable on white fields, including placeholders and autofill. */
+input, select, textarea {
+  color:#171717 !important;
+  background-color:#fff;
+  -webkit-text-fill-color:#171717;
+}
+input::placeholder, textarea::placeholder { color:#666 !important; opacity:1; }
+select option { color:#171717; background:#fff; }
+input:focus, select:focus, textarea:focus { color:#171717; background:#fff; }
+.site-footer { background:#fff; color:#171717; }
+.site-footer a, .site-footer p, .site-footer li { color:#171717; }
+@media (prefers-color-scheme: dark) {
+  input, select, textarea { color:#171717 !important; background-color:#fff; -webkit-text-fill-color:#171717; }
+  input::placeholder, textarea::placeholder { color:#666 !important; }
+  select option { color:#171717; background:#fff; }
+}
