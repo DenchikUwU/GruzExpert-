@@ -415,3 +415,48 @@ input:focus, select:focus, textarea:focus { color:#171717; background:#fff; }
   input::placeholder, textarea::placeholder { color:#666 !important; }
   select option { color:#171717; background:#fff; }
 }
+
+
+/* Final touch: restore the dark, photo-led bottom call-to-action section only */
+.cta-section, .cta, .contact-cta, .bottom-cta, .price-cta {
+  background-color:#080808;
+  color:#fff;
+}
+.cta-section h1, .cta-section h2, .cta-section h3, .cta-section p,
+.cta h1, .cta h2, .cta h3, .cta p,
+.contact-cta h1, .contact-cta h2, .contact-cta h3, .contact-cta p,
+.bottom-cta h1, .bottom-cta h2, .bottom-cta h3, .bottom-cta p,
+.price-cta h1, .price-cta h2, .price-cta h3, .price-cta p {
+  color:#fff;
+}
+.cta-section a, .cta a, .contact-cta a, .bottom-cta a, .price-cta a { color:#ffc400; }
+.cta-section .button, .cta .button, .contact-cta .button,
+.bottom-cta .button, .price-cta .button {
+  background:#ffc400; color:#080808;
+}
+
+/* Final touch: restore the original dark bottom/contact section with the photo background */
+.site-footer {
+  background:#080808 !important;
+  color:#fff !important;
+  border-top:1px solid #292929;
+}
+.site-footer p,
+.site-footer .footer-heading,
+.site-footer .footer-contact,
+.site-footer .footer-contact a,
+.site-footer .footer-bottom,
+.site-footer .footer-bottom a,
+.site-footer .footer-content > div,
+.site-footer .footer-content > div > span {
+  color:#fff !important;
+}
+.site-footer a { color:#fff; }
+.site-footer a:hover { color:#ffc400 !important; }
+.site-footer .footer-map {
+  background-image:linear-gradient(rgba(0,0,0,.62),rgba(0,0,0,.62)),var(--map-photo);
+  opacity:.72;
+}
+.site-footer .map-grid { opacity:.35; }
+.site-footer .footer-bottom { border-top:1px solid #393939; }
+.site-footer .button { background:#ffc400; color:#080808 !important; }
